@@ -19,9 +19,10 @@ gunzip Mus_musculus.GRCm39.112.gtf.gz
 ```
 
 #### Step 4: Build mouse genome index
+##### STAR version 2.7.11b
 ```
 mkdir GenomeIndex
-TAR --runThreadN 20 --runMode genomeGenerate --genomeDir GenomeIndex --genomeFastaFiles Mus_musculus.GRCm39.dna_sm.toplevel.fa --sjdbGTFfile Mus_musculus.GRCm39.112.gtf  --sjdbOverhang 99
+STAR --runThreadN 20 --runMode genomeGenerate --genomeDir GenomeIndex --genomeFastaFiles Mus_musculus.GRCm39.dna_sm.toplevel.fa --sjdbGTFfile Mus_musculus.GRCm39.112.gtf  --sjdbOverhang 99
 ```
 #### Step 5: Aligning FASTQ reads to the mouse genome index
 ```
@@ -33,15 +34,18 @@ Raw = Folder with FASTQ files in .gz format
 AlIGNMENTS = Folder to save the output files
 ```
 #### Step 6: Generate read counts
+##### R version 4.4.0 and Rsubread_2.18.0
 ```
 
 ```
 #### Step 7: Perform differential expression (DE) analysis for tolerance only
+##### R version 4.4.0 and DESeq2_1.44.0 
 ```
 
 ```
 
 #### Step 8: Perform DE analysis for tolerance and sex
+##### R version 4.4.0 and DESeq2_1.44.0 
 ```
 
 ```
