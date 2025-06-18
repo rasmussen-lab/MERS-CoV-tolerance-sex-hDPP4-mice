@@ -23,6 +23,8 @@ gunzip Mus_musculus.GRCm39.112.gtf.gz
 ```
 mkdir GenomeIndex
 STAR --runThreadN 20 --runMode genomeGenerate --genomeDir GenomeIndex --genomeFastaFiles Mus_musculus.GRCm39.dna_sm.toplevel.fa --sjdbGTFfile Mus_musculus.GRCm39.112.gtf  --sjdbOverhang 99
+
+GenomeIndex = Location where generated output files will be saved
 ```
 #### Step 5: Aligning FASTQ reads to the mouse genome index
 ```
