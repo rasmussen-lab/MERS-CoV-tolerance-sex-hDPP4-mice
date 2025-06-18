@@ -1,5 +1,3 @@
-#module load r/4.4.0
-
 library(DESeq2)
 library(vsn)
 library(ggplot2)
@@ -18,6 +16,8 @@ ddsMat <- DESeq(ddsMat)
 write.csv(as.data.frame(counts(ddsMat)),file="MERSRawCount.csv")
 
 ##### Differential expression comparisons
+
+### Day 1
 
 res1L_F <- results(ddsMat, alpha = 0.05,contrast=c("Collection_Date", "Day1_LOW_F","Day1_MOCK_F"))
 mcols(res1L_F, use.names = TRUE)
@@ -44,6 +44,7 @@ res1H_MOrdered <- res1H_M[order(res1H_M$pvalue),]
 write.csv(as.data.frame(res1H_MOrdered), file="Day1_HIGHvsMOCK_M.csv")
 
 ### Day 2
+
 res2L_F <- results(ddsMat, alpha = 0.05,contrast=c("Collection_Date", "Day2_LOW_F","Day2_MOCK_F"))
 mcols(res2L_F, use.names = TRUE)
 summary(res2L_F)
@@ -68,7 +69,7 @@ summary(res2H_M)
 res2H_MOrdered <- res2H_M[order(res2H_M$pvalue),]
 write.csv(as.data.frame(res2H_MOrdered), file="Day2_HIGHvsMOCK_M.csv")
 
-# Day 3
+### Day 3
 
 res3L_F <- results(ddsMat, alpha = 0.05,contrast=c("Collection_Date", "Day3_LOW_F","Day3_MOCK_F"))
 mcols(res3L_F, use.names = TRUE)
@@ -94,7 +95,7 @@ summary(res3H_M)
 res3H_MOrdered <- res3H_M[order(res3H_M$pvalue),]
 write.csv(as.data.frame(res3H_MOrdered), file="Day3_HIGHvsMOCK_M.csv")
 
-# Day 4
+### Day 4
 
 res4L_F <- results(ddsMat, alpha = 0.05,contrast=c("Collection_Date", "Day4_LOW_F","Day4_MOCK_F"))
 mcols(res4L_F, use.names = TRUE)
@@ -120,7 +121,7 @@ summary(res4H_M)
 res4H_MOrdered <- res4H_M[order(res4H_M$pvalue),]
 write.csv(as.data.frame(res4H_MOrdered), file="Day4_HIGHvsMOCK_M.csv")
 
-# Day 5
+### Day 5
 
 res5L_F <- results(ddsMat, alpha = 0.05,contrast=c("Collection_Date", "Day5_LOW_F","Day5_MOCK_F"))
 mcols(res5L_F, use.names = TRUE)
