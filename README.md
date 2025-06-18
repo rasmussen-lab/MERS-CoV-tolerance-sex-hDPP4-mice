@@ -3,11 +3,12 @@
 
 #### Step 1: Download the FASTQ files from NCBI BioProject PRJNA1276520
 #### Step 2: Check the quality of the FASTQ files
+##### FastQC version 0.12.1
 ```
-fastqc -o RESULTS/QC -f fastq -t 20 Marin/Raw/*.gz
+fastqc -o RESULTS/QC -f fastq -t 20 FASTQ/*.gz
 
 RESULTS/QC = Folder to save the output
-fastq = Folder with FASTQ files in .gz format
+FASTQ = Folder with FASTQ files in .gz format
 ```
 #### Step 3: Download mouse genome and annotation
 ```
