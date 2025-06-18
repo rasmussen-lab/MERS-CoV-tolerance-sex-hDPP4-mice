@@ -14,22 +14,6 @@ keep <- rowSums(counts(ddsMat) >= 15) >= 6
 ddsMat <- ddsMat[keep,]
 nrow(ddsMat)
 
-vsd <- vst(ddsMat, blind = FALSE)
-head(assay(vsd))
-sampleDists <- dist(t(assay(vsd)))
-sampleDists
-
-sampleDistMatrix <- as.matrix(sampleDists)
-rownames(sampleDistMatrix) <- paste(StudyDes$Dose_Group, StudyDes$Collection_Date, sep="-")
-
-
-mds <- data.frame(cmdscale(sampleDistMatrix))
-mds <- cbind(mds, colData(vsd))
-pdf("Figure1_MDSPlot_DosegroupVsDate.pdf")
-p <- qplot(X1,X2,color=Dose_Group,shape=Sex,data=as.data.frame(mds),xlab = "Dimension1", ylab = "Dimension2")+geom_point(size =3)
-p + theme_classic()+theme(panel.background = element_blank(),strip.background = element_rect(colour=NA, fill=NA),panel.border = element_rect(fill = NA, color = "black"),legend.title = element_blank(),legend.position="bottom", strip.text = element_text(face="bold", size=9), axis.text=element_text(face="bold"),axis.title = element_text(face="bold"),plot.title = element_text(face = "bold", hjust = 0.5,size=13))
-dev.off()
-
 ddsMat <- DESeq(ddsMat)
 write.csv(as.data.frame(counts(ddsMat)),file="MERSRawCount.csv")
 
