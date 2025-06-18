@@ -49,16 +49,18 @@ AlIGNMENTS = Folder to save the output files
 ```
 
 ```
-#### Step 8: Upload DE results to IPA
-```
 
-```
-#### Step 9: Generate volcano plots of DE genes
+#### Step 8: Generate volcano plots of DE genes
 ```
 
 ```
 
-#### Step 10: Perform multidimensional scaling (MDS) plot of DE genes
+#### Step 9: Perform multidimensional scaling (MDS) plot of DE genes
 ```
 
 ```
+#### Step 10: Upload DE results to IPA
+
+Uploaded DE lists generated in Step 8. to Ingenuity Pathway Analysis for functional enrichment analysis.
+
+
