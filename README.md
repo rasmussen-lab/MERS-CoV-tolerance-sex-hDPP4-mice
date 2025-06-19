@@ -28,9 +28,9 @@ GenomeIndex = Location where generated output files will be saved
 ```
 #### Step 5: Aligning FASTQ reads to the mouse genome index
 ```
-python StarAlignS.py Input1.txt GenomeIndex Raw ALIGNMENTS
+python Scripts/StarAlignS.py Data/Input.txt GenomeIndex Raw ALIGNMENTS
 
-Input1.txt = Tab delimited file listing paired-end FASTQ files
+Input.txt = Tab delimited file listing paired-end FASTQ files
 GenomeIndex =  Folder with mouse genome index
 Raw = Folder with FASTQ files in .gz format
 AlIGNMENTS = Folder to save the output files
@@ -38,7 +38,7 @@ AlIGNMENTS = Folder to save the output files
 #### Step 6: Generate read counts
 ##### R version 4.4.0 and Rsubread_2.18.0
 ```
-
+Rscript Scripts/ReadCountSE.R
 ```
 #### Step 7: Perform differential expression (DE) analysis for tolerance only
 ##### R version 4.4.0 and DESeq2_1.44.0 
