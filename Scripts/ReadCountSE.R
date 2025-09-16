@@ -1,3 +1,5 @@
+# Script created by Dr.Reema Singh
+
 library(Rsubread)
 setwd("ALIGNMENT")
 file_list <- list.files(pattern="*.bam$")
