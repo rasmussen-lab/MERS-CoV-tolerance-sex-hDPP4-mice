@@ -1,3 +1,6 @@
+# Script originally created by Dr. Reema Singh
+# Modifications made by Marin Habbick
+
 library(DESeq2)
 library(vsn)
 library(ggplot2)
