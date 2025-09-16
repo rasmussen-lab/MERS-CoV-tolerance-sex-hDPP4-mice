@@ -65,4 +65,7 @@ Rscript Scripts/ReadCountSE.R
 
 Uploaded DE lists generated in Step 8. to Ingenuity Pathway Analysis for functional enrichment analysis.
 
+## Authors
 
+This script was originally created by Dr. Reema Singh
+Contributions and modifications by Marin Habbick
