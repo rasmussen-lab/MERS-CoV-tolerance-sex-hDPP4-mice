@@ -67,27 +67,28 @@ Uploaded DE lists generated in Step 8. to Ingenuity Pathway Analysis for functio
 
 ## Workflow Engineering & Implementation
 
-### Core Systems Architect & Lead Developer
-Dr. Reema Singh (res498@usask.ca) 
+#### Computational Workflow Architecture & Implementation:
 
-Responsible for the foundational technical architecture, logic-gated framework, and core analytical wrappers.
+Dr. Reema Singh (res498@usask.ca)
+Designed and implemented the core analytical architecture, logic-gated framework, and primary computational wrappers.
 
-### Technical Infrastructure
-This repository is built upon the standardized Workflow Engineering logic developed and validated by Dr. Reema Singh within the Rasmussen Lab. This architecture provides the modular framework and automated logic-gates required for high-throughput reproducibility of the MERS-CoV dataset.
+#### Lab Context & Technical Infrastructure:
+This repository contains a standardized RNA-seq workflow developed and validated within the Rasmussen Lab. The computational architecture provides a modular, logic-gated framework supporting reproducible high-throughput analysis of MERS-CoV datasets.
 
-### Study-Specific Implementation & Functional Mapping
-#### Pipeline Execution: 
-Marin Habbick (Responsible for the execution of the MERS-CoV sex-tolerance study pipeline, including parameter configuration and study-level data mapping.)
-#### Functional Enrichment & IPA: 
-Dr. Angela Rasmussen and Marin Habbick (Responsible for the downstream biological interpretation and Ingenuity Pathway Analysis mapping).
+#### Study-Specific Implementation & Functional Mapping
 
-### Code Adaptations & Visualization
+	•	Pipeline Execution & Study-Level Mapping:
+Marin Habbick
+	•	Functional Enrichment & IPA:
+Dr. Angela Rasmussen, Marin Habbick
+
+#### Code Adaptations & Visualization:
 Implementation-level modifications: Marin Habbick
 
-Note on AI-Assistance: In alignment with the manuscript's disclosure, specific study-level adaptations (Steps 9 & 10) and visualization components utilized AI-assisted code generation for implementation-specific mapping.
+#### Note on AI Assistance:
+In alignment with manuscript disclosures, select study-specific adaptations (Steps 9–10) and visualization components utilized AI-assisted code generation.
 
 #### Validation & Reproducibility
 
-Framework Stability: This pipeline has been validated across multiple datasets (Ebola, MERS-CoV) within the Rasmussen Lab to ensure cross-species logic consistency.
-
-Logic-Gating: All filtering thresholds and batch-correction wrappers were benchmarked for high-fidelity transcriptomic recovery.
+	•	Framework Stability: Validated across multiple datasets (Ebola, MERS-CoV) within the Rasmussen Lab.
+	•	Logic Gating: Filtering thresholds and batch-correction workflows were benchmarked for analytical fidelity.
