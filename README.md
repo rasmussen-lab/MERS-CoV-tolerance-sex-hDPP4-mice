@@ -75,11 +75,11 @@ Designed and implemented the core analytical architecture, logic-gated framework
 #### Lab Context & Technical Infrastructure:
 This repository contains a standardized RNA-seq workflow developed and validated within the Rasmussen Lab. The computational architecture provides a modular, logic-gated framework supporting reproducible high-throughput analysis of MERS-CoV datasets.
 
-#### Study-Specific Implementation & Functional Mapping
+#### Study-Specific Implementation & Functional Mapping: 
 
-	•	Pipeline Execution & Study-Level Mapping:
+	Pipeline Execution & Study-Level Mapping:
 Marin Habbick
-	•	Functional Enrichment & IPA:
+	Functional Enrichment & IPA:
 Dr. Angela Rasmussen, Marin Habbick
 
 #### Code Adaptations & Visualization:
