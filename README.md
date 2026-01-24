@@ -85,3 +85,9 @@ Dr. Angela Rasmussen and Marin Habbick (Responsible for the downstream biologica
 Implementation-level modifications: Marin Habbick
 
 Note on AI-Assistance: In alignment with the manuscript's disclosure, specific study-level adaptations (Steps 9 & 10) and visualization components utilized AI-assisted code generation for implementation-specific mapping.
+
+#### Validation & Reproducibility
+
+Framework Stability: This pipeline has been validated across multiple datasets (Ebola, MERS-CoV) within the Rasmussen Lab to ensure cross-species logic consistency.
+
+Logic-Gating: All filtering thresholds and batch-correction wrappers were benchmarked for high-fidelity transcriptomic recovery.
