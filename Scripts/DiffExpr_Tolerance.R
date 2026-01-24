@@ -1,5 +1,12 @@
-# Script originally created by Dr. Reema Singh
-# Modifications made by Marin Habbick
+# ==============================================================================
+# CORE ARCHITECTURE: Dr. Reema Singh (res498@usask.ca)
+# PROJECT:           MERS-CoV DE Framework
+# FOUNDATION:        Standardized Workflow Engineering (Validated)
+# ------------------------------------------------------------------------------
+# STUDY-SPECIFIC ADAPTATION: Marin Habbick
+# CHANGE LOG:        Implementation-level modifications for MERS sex-tolerance study.
+#                    [Note: Includes AI-assisted code adaptations]
+# ==============================================================================
 
 # Low vs. Mock
 Day1_LOWvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day1_LOW", "Day1_MOCK"))
