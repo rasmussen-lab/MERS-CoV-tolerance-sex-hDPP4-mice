@@ -86,7 +86,7 @@ Dr. Angela Rasmussen, Marin Habbick
 Implementation-level modifications: Marin Habbick
 
 #### Note on AI Assistance:
-In alignment with manuscript disclosures, select study-specific adaptations (Steps 9–10) and visualization components utilized AI-assisted code generation.
+In alignment with manuscript disclosures, AI-assisted code generation was used for select study-specific adaptations (Steps 9–10) and visualization components..
 
 #### Validation & Reproducibility
 
