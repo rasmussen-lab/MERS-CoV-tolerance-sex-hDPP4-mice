@@ -68,13 +68,18 @@ Uploaded DE lists generated in Step 8. to Ingenuity Pathway Analysis for functio
 ## Workflow Engineering & Implementation
 
 ### Core Systems Architect & Lead Developer
-Dr. Reema Singh (res498@usask.ca) Responsible for the foundational technical architecture, logic-gated framework, and core analytical wrappers.
+Dr. Reema Singh (res498@usask.ca) 
+
+Responsible for the foundational technical architecture, logic-gated framework, and core analytical wrappers.
 
 ### Technical Infrastructure
-This repository is built upon the standardized Workflow Engineering logic developed and validated by Dr. Reema Singh within the Rasmussen Lab. This architecture provides the modular framework and automated logic-gates required for high-throughput reproducibility.
+This repository is built upon the standardized Workflow Engineering logic developed and validated by Dr. Reema Singh within the Rasmussen Lab. This architecture provides the modular framework and automated logic-gates required for high-throughput reproducibility of the MERS-CoV dataset.
 
-### Study-Specific Implementation
-Marin Habbick Responsible for the execution of the MERS-CoV sex-tolerance study pipeline, including parameter configuration and study-level data mapping.
+### Study-Specific Implementation & Functional Mapping
+#### Pipeline Execution: 
+Marin Habbick (Responsible for the execution of the MERS-CoV sex-tolerance study pipeline, including parameter configuration and study-level data mapping.)
+#### Functional Enrichment & IPA: 
+Dr. Angela Rasmussen and Marin Habbick (Responsible for the downstream biological interpretation and Ingenuity Pathway Analysis mapping).
 
 ### Code Adaptations & Visualization
 Implementation-level modifications: Marin Habbick
