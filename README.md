@@ -65,9 +65,16 @@ Rscript Scripts/ReadCountSE.R
 
 Uploaded DE lists generated in Step 8. to Ingenuity Pathway Analysis for functional enrichment analysis.
 
-## Authors
+## Workflow Engineering & Implementation
 
-This script was originally created by Dr. Reema Singh
+### Lead Systems Developer & Architect:
+Dr. Reema Singh (res498@usask.ca)
 
+### Core Technical Architecture:
+This repository is built upon the standardized Workflow Engineering and logic-gated framework developed by Dr. Reema Singh.
 
-Contributions and modifications by Marin Habbick
+### Logic & Automation:
+The foundational analytical logic and core Python/R wrappers were engineered and validated by Dr. Reema Singh within the Rasmussen Lab.
+
+### Study-Specific Implementation & AI-Assisted Adaptation:
+Marin Habbick (Executed the pipeline and performed study-specific code adaptations for the MERS-CoV sex-tolerance study within the Rasmussen Lab.)
