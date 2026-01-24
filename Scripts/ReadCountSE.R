@@ -1,4 +1,11 @@
-# Script created by Dr.Reema Singh
+# ==============================================================================
+# DESIGN & IMPLEMENTATION: Dr. Reema Singh (res498@usask.ca)
+# PROJECT: MERS-CoV DE Framework
+# VERSION: 1.1.0 (Stable)
+# ------------------------------------------------------------------------------
+# DESCRIPTION: Multi-species transcriptomic pipeline. 
+# Optimized for STAR alignment and DESeq2 statistical modeling.
+# ==============================================================================
 
 library(Rsubread)
 setwd("ALIGNMENT")
