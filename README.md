@@ -43,13 +43,13 @@ Rscript Scripts/ReadCountSE.R
 #### Step 7: Perform differential expression (DE) analysis for tolerance only
 ##### R version 4.4.0 and DESeq2_1.44.0 
 ```
-
+Rscript Scripts/DiffExpr_Tolerance.R
 ```
 
 #### Step 8: Perform DE analysis for tolerance and sex
 ##### R version 4.4.0 and DESeq2_1.44.0 
 ```
-
+Rscript Scripts/DiffExpr_ToleranceSex.R
 ```
 
 #### Step 8: Generate volcano plots of DE genes
