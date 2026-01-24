@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 # STUDY-SPECIFIC ADAPTATION: Marin Habbick
 # CHANGE LOG:        Implementation-level modifications for MERS sex-tolerance study.
-#                    [Note: Includes AI-assisted code adaptations]
+#                    [Note: Manual parameter configuration and data mapping]
 # ==============================================================================
 
 # Low vs. Mock
