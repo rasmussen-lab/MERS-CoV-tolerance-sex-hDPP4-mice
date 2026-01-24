@@ -77,9 +77,9 @@ This repository contains a standardized RNA-seq workflow developed and validated
 
 #### Study-Specific Implementation & Functional Mapping: 
 
-##### Pipeline Execution & Study-Level Mapping:
+#### Pipeline Execution & Study-Level Mapping:
 Marin Habbick
-##### Functional Enrichment & IPA:
+#### Functional Enrichment & IPA:
 Dr. Angela Rasmussen, Marin Habbick
 
 #### Code Adaptations & Visualization:
