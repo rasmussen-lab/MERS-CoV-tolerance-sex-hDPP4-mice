@@ -54,7 +54,7 @@ Rscript Scripts/DiffExpr_ToleranceSex.R
 
 #### Step 9: Generate volcano plots of DE genes
 ```
-
+Rscript -e "rmarkdown::render('Scripts/Volcano.Rmd')
 ```
 
 #### Step 10: Perform multidimensional scaling (MDS) plot of DE genes
