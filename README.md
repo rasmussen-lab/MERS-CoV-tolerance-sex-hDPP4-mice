@@ -59,7 +59,7 @@ Rscript Scripts/DiffExpr_ToleranceSex.R
 
 #### Step 10: Perform multidimensional scaling (MDS) plot of DE genes
 ```
-
+Rscript -e "rmarkdown::render('Scripts/MDS.Rmd')
 ```
 #### Step 11: Upload DE results to IPA
 
