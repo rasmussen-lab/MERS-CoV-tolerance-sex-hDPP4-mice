@@ -1,0 +1,343 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### Load libraries
+```{r}
+library(DESeq2)
+library(vsn)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+```
+
+# Tolerance only analysis
+
+#### Load counts data and meta-data
+```{r}
+Counts1 <- read.table(file="Comp1readCountTDM_MERS_github.txt", sep="\t", header=T)
+
+names(Counts1) <- gsub("Aligned.sortedByCoord.out.bam", "", names(Counts1))
+
+StudyDes1 <- read.table(file="StudyDesignComp1_github.txt", sep="\t", header = TRUE)
+StudyDes1 <- StudyDes1[, -4] # remove column with sex of samples
+```
+
+#### Convert to matrix, filter out low read genes
+```{r}
+ddsMat1 <- DESeqDataSetFromMatrix(countData = Counts1, colData = StudyDes1, design = ~Collection_Date)
+nrow(ddsMat1)
+keep <- rowSums(counts(ddsMat1) >= 15) >= 6 # keeps genes that have 15 or more counts in at least 6 samples
+ddsMat1 <- ddsMat1[keep,]
+nrow(ddsMat1)
+```
+
+## Part I. MDS plot of normalized counts for all genes
+
+#### Variance-stabalize all genes, calculate Euclidean distances
+```{r}
+# apply variance-stabilizing transformation, blind = FALSE to preserve meta-data grouping
+vsd1 <- vst(ddsMat1, blind = FALSE)
+head(assay(vsd1))
+
+# calculate Euclidean distances
+sampleDists1 <- dist(t(assay(vsd1)))
+
+# convert to matrix
+sampleDistMatrix1 <- as.matrix(sampleDists1)
+rownames(sampleDistMatrix1) <- paste(StudyDes1$Collection_Date, sep="-")
+
+# multidimensional scaling (MDS) of data matrix
+mds1 <- data.frame(cmdscale(sampleDistMatrix1))
+mds1 <- cbind(mds1, colData(vsd1))
+```
+
+#### Generate MDS plot for normalized genes
+```{r}
+# split 'Collection_Date' into Day and Condition columns
+mds1_filtered <- mds1 %>%
+  separate(Collection_Date, into = c("Day", "Condition"), sep = "_") %>%
+  filter(!is.na(Condition))
+
+# define color based on Condition
+condition_colours <- c("HIGH" = "red", "LOW" = "blue", "MOCK" = "darkgrey")
+
+# define shape based on Day
+day_shapes <- c(
+  "Day1" = 1,  # open circle
+  "Day2" = 2,  # open triangle
+  "Day3" = 15,  # square
+  "Day4" = 17,  # triangle
+  "Day5" = 16)   # circle 
+
+# generate the MDS Plot
+ggplot(mds1_filtered, aes(x = X1, y = X2, shape = Day, color = Condition)) +
+  geom_point(size = 4, alpha = 0.8) +
+  scale_color_manual(values = condition_colours,
+                     labels = c("High dose", "Low dose", "Mock")) +
+  scale_shape_manual(values = day_shapes,
+                     labels = c("1", "2", "3", "4", "5")) +
+  theme_classic() +
+  labs(x = "Dimension 1", 
+       y = "Dimension 2") +
+  theme(text = element_text(family = "Times"),
+        legend.position = "right",
+        legend.title = element_text(size = 17, face = "bold"),
+        legend.text = element_text(size = 16),
+        axis.title = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 17),
+        axis.line = element_line(size = 0.1, color = "black"),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.5),
+        aspect.ratio = 0.75)
+
+ggsave("MDS_Plot_Tolerance_normalized.png", width = 8, height = 6, dpi = 300)
+```
+## Part II. MDS plot of normalized counts for differentially expressed (DE) genes
+
+#### Run DESeq2 analysis
+```{r}
+# 0.05 p-value cut-off
+DEMat1 <- DESeq(ddsMat1)
+res1 <- results(DEMat1, alpha = 0.05) 
+summary(res1)
+
+# define DE gene expression as p < 0.05 and Log2FC > |1.5|
+DE_genes1 <- rownames(res1[!is.na(res1$padj) & !is.na(res1$log2FoldChange) &
+                           res1$padj < 0.05 & abs(res1$log2FoldChange) > 1.5, ])
+```
+
+#### Variance-stabalize DE genes, calculate Euclidean distances
+```{r}
+# apply variance-stabilizing transformation, blind = FALSE to preserve meta-data grouping
+vsd1_de <- vst(DEMat1, blind = FALSE) 
+vsd1_de_cut_off <- assay(vsd1)[DE_genes1, ] # subset VST data to include DE genes only
+head(vsd1_de_cut_off)
+
+# calculate Euclidean distances 
+sampleDists_de1 <- dist(t(vsd1_de_cut_off))
+
+# convert to matrix
+sampleDistMatrix_de1 <- as.matrix(sampleDists_de1)
+rownames(sampleDistMatrix_de1) <- paste(StudyDes1$Collection_Date, sep="-")
+
+# multidimensional scaling (MDS) of data matrix
+mds_de1 <- data.frame(cmdscale(sampleDistMatrix_de1))
+mds1_de1 <- cbind(mds_de1, colData(vsd1_de))
+```
+
+#### Generate MDS plot for normalized DE genes
+```{r}
+# split 'Collection_Date' into Day and Condition columns
+mds_data_de1_filtered <- mds1_de1 %>%
+  separate(Collection_Date, into = c("Day", "Condition"), sep = "_") %>%
+  filter(Condition != "MOCK") 
+
+# define color based on Condition
+condition_colors1 <- c("HIGH" = "red", "LOW" = "blue")
+
+# define shape based on Day
+day_shapes <- c(
+  "Day1" = 1,  # open circle
+  "Day2" = 2,  # open triangle
+  "Day3" = 15,  # square
+  "Day4" = 17,  # triangle
+  "Day5" = 16)   # circle
+
+# generate the MDS plot
+ggplot(mds_data_de1_filtered, aes(x = X1, y = X2, color = Condition, shape = Day)) +
+  geom_point(size = 4, stroke = 2) +
+  scale_color_manual(values = condition_colors1,
+                     labels = c("High dose", "Low dose")) +
+  scale_shape_manual(values = day_shapes,
+                     labels = c("1", "2", "3", "4", "5")) +
+  theme_classic() +
+  labs(x = "Dimension 1", 
+       y = "Dimension 2") +
+  theme(text = element_text(family = "Times"),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        legend.title = element_text(size = 18, face = "bold"),
+        legend.text = element_text(size = 17),
+        axis.title = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 17),
+        axis.line = element_line(size = 0.1, color = "black"),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.5))
+
+ggsave("MDS_Plot_Tolerance_DE_1.png", width = 8, height = 7, dpi = 300)
+```
+
+# Tolerance and sex analysis
+
+#### Load counts data and meta-data
+```{r}
+Counts2 <- read.table(file="Comp2readCountTDM_MERS_github.txt", sep="\t", header = TRUE, check.names = FALSE)
+
+names(Counts2) <- gsub("Aligned.sortedByCoord.out.bam", "", names(Counts2))
+
+StudyDes2 <- read.table(file="StudyDesignComp2_github.txt", sep="\t", header = TRUE)
+```
+
+#### Convert to matrix, filter out low read genes
+```{r}
+ddsMat2 <- DESeqDataSetFromMatrix(countData = Counts2, colData = StudyDes2, design = ~Collection_Date)
+nrow(ddsMat2)
+keep <- rowSums(counts(ddsMat2) >= 15) >= 6 # keeps genes that have 15 or more counts in at least 6 samples
+ddsMat <- ddsMat2[keep,]
+nrow(ddsMat2)
+```
+## Part I. MDS plot of normalized counts for all genes
+
+#### Variance-stabalize all genes, calculate Euclidean distances
+```{r}
+# apply variance-stabilizing transformation, blind = FALSE to preserve meta-data grouping
+vsd2 <- vst(ddsMat2, blind = FALSE)
+head(assay(vsd2))
+
+# calculate Euclidean distances
+sampleDists2 <- dist(t(assay(vsd2)))
+
+# convert to matrix
+sampleDistMatrix2 <- as.matrix(sampleDists2)
+rownames(sampleDistMatrix2) <- paste(StudyDes2$Collection_Date, sep="-")
+
+# multidimensional scaling (MDS) of data matrix
+mds2 <- data.frame(cmdscale(sampleDistMatrix2))
+mds2 <- cbind(mds2, colData(vsd2))
+```
+
+#### Generate MDS plot for normalized genes
+```{r}
+# split 'Collection_Date' into Day, Condition and Sex columns
+mds2_filtered <- mds2 %>%
+  separate(Collection_Date, into = c("Day", "Condition", "Sex"), sep = "_") %>%
+  filter(!is.na(Condition))
+
+# merge Condition and Sex again
+mds2_filtered$Condition_Sex <- paste(mds2_filtered$Condition, mds2_filtered$Sex, sep = "_")
+
+# define color based on Condition and Sex
+condition_sex_colors <- c("HIGH_F" = "red", "LOW_F" = "blue",  "HIGH_M" = "sienna1",  "LOW_M" = "cadetblue3",  
+                          "MOCK_F" = "gray61","MOCK_M" = "black")
+
+# define shape based on Day
+day_shapes <- c(
+  "Day1" = 1,  # open circle
+  "Day2" = 2,  # open triangle
+  "Day3" = 15,  # square
+  "Day4" = 17,  # triangle
+  "Day5" = 16)   # circle
+
+# generate the MDS Plot
+ggplot(mds2_filtered, aes(x = X1, y = X2, shape = Day, color = Condition_Sex)) +
+  geom_point(size = 4, alpha = 0.8) +
+  scale_color_manual(values = condition_sex_colors,
+                     labels = c("High dose female", "High dose male", "Low dose female", "Low dose male", "Mock female", "Mock male", "Day 1")) +
+  scale_shape_manual(values = day_shapes,
+                     labels = c("1", "2", "3", "4", "5")) +
+  theme_classic() +
+  labs(x = "Dimension 1", 
+       y = "Dimension 2") +
+  theme(text = element_text(family = "Times"),
+        legend.position = "right",
+        legend.title = element_text(size = 17, face = "bold"),
+        legend.text = element_text(size = 16),
+        axis.title = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 15),
+        axis.line = element_line(size = 0.1, color = "black"),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.5),
+        aspect.ratio = 0.75) +
+  guides(color = guide_legend(title = "Condition", order = 1),  # Change legend title for color
+         shape = guide_legend(title = "Day", order = 2)) +
+  scale_fill_discrete(labels=c('Lethal female', 'Lethal male', 'Tolerant female', 'Tolerant male')) 
+
+ggsave("MDS_Plot_Tolerance&Sex_normalized_2.png", width = 8, height = 6, dpi = 300)
+```
+## Part II. MDS plot of normalized counts for differentially expressed (DE) genes
+
+#### Run DESeq2 analysis
+```{r}
+# 0.05 p-value cut-off
+DEMat2 <- DESeq(ddsMat2)
+res2 <- results(DEMat2, alpha = 0.05) # p-value cut-off
+summary(res2)
+
+# define DE gene expression as p < 0.05 and Log2FC > |1.5|
+DE_genes2 <- rownames(res2[!is.na(res2$padj) & !is.na(res2$log2FoldChange) &
+                           res2$padj < 0.05 & abs(res2$log2FoldChange) > 1.5, ])
+```
+
+
+# Variance-stabalize DE genes, calculate Euclidean distances
+```{r}
+# apply variance stabilizing transformation (VST)
+vsd2_de <- vst(DEMat2, blind = FALSE) 
+vsd2_de_cut_off <- assay(vsd2_de)[DE_genes2, ] # subset VST data to include DE genes only
+head(vsd2_de_cut_off)
+
+# calculate Euclidean distances 
+sampleDists_de2 <- dist(t(vsd2_de_cut_off))
+
+# convert to matrix
+sampleDistMatrix_de2 <- as.matrix(sampleDists_de2)
+rownames(sampleDistMatrix_de2) <- paste(StudyDes2$Collection_Date, sep="-")
+
+# multidimensional scaling (MDS) of data matrix
+mds_de2 <- cmdscale(sampleDists_de2, k = 2)
+
+mds2_de2 <- data.frame(
+  Dim1 = mds_de2[,1],
+  Dim2 = mds_de2[,2],
+  as.data.frame(colData(vsd2_de))
+)
+```
+
+#### Generate MDS plot for normalized DE genes
+```{r}
+# split 'Collection_Date' into Day, Condition, and Sex columns
+mds_data_de2_filtered <- mds2_de2 %>%
+  separate(Collection_Date, into = c("Day", "Condition", "Sex"), sep = "_") %>%
+  filter(Condition != "MOCK")
+
+# merge Condition and Sex again
+mds_data_de2_filtered$Condition_Sex <- paste(mds_data_de2_filtered$Condition, mds_data_de2_filtered$Sex, sep = "_")
+
+# define color based on Condition and Sex
+condition_sex_colors <- c("HIGH_F" = "red",  "LOW_F" = "blue", "HIGH_M" = "sienna1", "LOW_M" = "cadetblue3")
+
+# define shape based on Day
+day_shapes <- c(
+  "Day1" = 1,  # open circle
+  "Day2" = 2,  # open triangle
+  "Day3" = 15,  # square
+  "Day4" = 17,  # triangle
+  "Day5" = 16)   # circle
+
+# Generate the MDS Plot
+ggplot(mds_data_de2_filtered, aes(x = Dim1, y = Dim2, shape = Day, color = Condition_Sex)) +
+  geom_point(size = 4, stroke = 2) +
+  scale_color_manual(values = condition_sex_colors,
+                     labels = c("High dose female", "High dose male", "Low dose female", "Low dose male", "Day 1")) +
+  scale_shape_manual(values = day_shapes,
+                     labels = c("1", "2", "3", "4", "5")) +
+  theme_classic() +
+  labs(x = "Dimension 1", 
+       y = "Dimension 2") +
+  theme(text = element_text(family = "Times"),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        legend.title = element_text(size = 17, face = "bold"),
+        legend.text = element_text(size = 16),
+        axis.title = element_text(size = 20, face = "bold"),
+        axis.text = element_text(size = 16),
+        axis.line = element_line(size = 0.1, color = "black"),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.5),
+        aspect.ratio = 0.8) +
+  guides(color = guide_legend(title = "Condition"),
+         shape = guide_legend(title = "Day")) +
+  scale_fill_discrete(labels=c('High dose female', 'High dose male', 'Low dose female', 'Low dose male')) 
+
+ggsave("MDS_Plot_Tolerance&Sex_DE.png", width = 10, height = 7, dpi = 300)
+```
+```
+
