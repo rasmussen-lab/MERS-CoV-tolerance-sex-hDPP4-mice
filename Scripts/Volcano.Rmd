@@ -1,0 +1,721 @@
+---
+title: "Volcano"
+author: "Marin H"
+date: "2026-02-13"
+output: html_document
+---
+
+## load libraries
+```{r}
+library(ggplot2)
+library(dplyr)
+library(DESeq2)
+library(ggtext)
+```
+
+# Tolerance only analysis
+
+#### Load counts data and meta-data
+```{r}
+Counts1 <- read.table(file="Comp1readCountTDM_MERS_github.txt", sep="\t", header=T)
+
+names(Counts1) <- gsub("Aligned.sortedByCoord.out.bam", "", names(Counts1))
+
+StudyDes1 <- read.table(file="StudyDesignComp1_github.txt", sep="\t", header = TRUE)
+StudyDes1 <- StudyDes1[, -4] # remove column with sex of samples
+```
+
+#### Convert to matrix, filter out low read genes
+```{r}
+ddsMat1 <- DESeqDataSetFromMatrix(countData = Counts1, colData = StudyDes1, design = ~Collection_Date)
+nrow(ddsMat1)
+keep <- rowSums(counts(ddsMat1) >= 15) >= 6 # keeps genes that have 15 or more counts in at least 6 samples
+ddsMat1 <- ddsMat1[keep,]
+nrow(ddsMat1)
+```
+
+#### Run DE analysis
+```{r}
+DE_1 <- DESeq(ddsMat1)
+```
+
+## Part I. Generate individual and combined volcano plots
+
+#### Extract results for specific comparisons
+```{r}
+# Low vs. Mock
+Day1_LOWvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day1_LOW", "Day1_MOCK"))
+Day1_LOWvsMOCK_df <- as.data.frame(Day1_LOWvsMOCK)
+Day1_LOWvsMOCK_df$Gene <- rownames(Day1_LOWvsMOCK_df)
+Day1_LOWvsMOCK_df$Day <- "Day1"
+Day1_LOWvsMOCK_df$Condition <- "Low"
+
+Day2_LOWvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day2_LOW", "Day2_MOCK"))
+Day2_LOWvsMOCK_df <- as.data.frame(Day2_LOWvsMOCK)
+Day2_LOWvsMOCK_df$Gene <- rownames(Day2_LOWvsMOCK_df)
+Day2_LOWvsMOCK_df$Day <- "Day2"
+Day2_LOWvsMOCK_df$Condition <- "Low"
+
+Day3_LOWvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day3_LOW", "Day3_MOCK"))
+Day3_LOWvsMOCK_df <- as.data.frame(Day3_LOWvsMOCK)
+Day3_LOWvsMOCK_df$Gene <- rownames(Day3_LOWvsMOCK_df)
+Day3_LOWvsMOCK_df$Day <- "Day3"
+Day3_LOWvsMOCK_df$Condition <- "Low"
+
+Day4_LOWvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day4_LOW", "Day4_MOCK"))
+Day4_LOWvsMOCK_df <- as.data.frame(Day4_LOWvsMOCK)
+Day4_LOWvsMOCK_df$Gene <- rownames(Day4_LOWvsMOCK_df)
+Day4_LOWvsMOCK_df$Day <- "Day4"
+Day4_LOWvsMOCK_df$Condition <- "Low"
+
+Day5_LOWvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day5_LOW", "Day5_MOCK"))
+Day5_LOWvsMOCK_df <- as.data.frame(Day5_LOWvsMOCK)
+Day5_LOWvsMOCK_df$Gene <- rownames(Day5_LOWvsMOCK_df)
+Day5_LOWvsMOCK_df$Day <- "Day5"
+Day5_LOWvsMOCK_df$Condition <- "Low"
+
+
+# High vs. Mock
+Day1_HIGHvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day1_HIGH", "Day1_MOCK"))
+Day1_HIGHvsMOCK_df <- as.data.frame(Day1_HIGHvsMOCK)
+Day1_HIGHvsMOCK_df$Gene <- rownames(Day1_HIGHvsMOCK_df)
+Day1_HIGHvsMOCK_df$Day <- "Day1"
+Day1_HIGHvsMOCK_df$Condition <- "High"
+
+
+Day2_HIGHvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day2_HIGH", "Day2_MOCK"))
+Day2_HIGHvsMOCK_df <- as.data.frame(Day2_HIGHvsMOCK)
+Day2_HIGHvsMOCK_df$Gene <- rownames(Day2_HIGHvsMOCK_df)
+Day2_HIGHvsMOCK_df$Day <- "Day2"
+Day2_HIGHvsMOCK_df$Condition <- "High"
+
+
+Day3_HIGHvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day3_HIGH", "Day3_MOCK"))
+Day3_HIGHvsMOCK_df <- as.data.frame(Day3_HIGHvsMOCK)
+Day3_HIGHvsMOCK_df$Gene <- rownames(Day3_HIGHvsMOCK_df)
+Day3_HIGHvsMOCK_df$Day <- "Day3"
+Day3_HIGHvsMOCK_df$Condition <- "High"
+
+
+Day4_HIGHvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day4_HIGH", "Day4_MOCK"))
+Day4_HIGHvsMOCK_df <- as.data.frame(Day4_HIGHvsMOCK)
+Day4_HIGHvsMOCK_df$Gene <- rownames(Day4_HIGHvsMOCK_df)
+Day4_HIGHvsMOCK_df$Day <- "Day4"
+Day4_HIGHvsMOCK_df$Condition <- "High"
+
+
+Day5_HIGHvsMOCK <- results(DE_1, alpha = 0.05, contrast = c("Collection_Date", "Day5_HIGH", "Day5_MOCK"))
+Day5_HIGHvsMOCK_df <- as.data.frame(Day5_HIGHvsMOCK)
+Day5_HIGHvsMOCK_df$Gene <- rownames(Day5_HIGHvsMOCK_df)
+Day5_HIGHvsMOCK_df$Day <- "Day5"
+Day5_HIGHvsMOCK_df$Condition <- "High"
+
+
+# combine results from all comparisons
+DE1_results_LOW_df <- rbind(Day1_LOWvsMOCK_df, Day2_LOWvsMOCK_df, Day3_LOWvsMOCK_df,
+                            Day4_LOWvsMOCK_df, Day5_LOWvsMOCK_df)
+DE1_results_HIGH_df <- rbind(Day1_HIGHvsMOCK_df, Day2_HIGHvsMOCK_df, Day3_HIGHvsMOCK_df,
+                             Day4_HIGHvsMOCK_df, Day5_HIGHvsMOCK_df)
+
+DE1_results_ALL_df <- rbind(Day1_LOWvsMOCK_df, Day2_LOWvsMOCK_df, Day3_LOWvsMOCK_df, 
+                            Day4_LOWvsMOCK_df, Day5_LOWvsMOCK_df, Day1_HIGHvsMOCK_df,
+                            Day2_HIGHvsMOCK_df, Day3_HIGHvsMOCK_df, Day4_HIGHvsMOCK_df,
+                            Day5_HIGHvsMOCK_df)
+```
+
+#### Generate plotting function
+```{r}
+plot_volcano <- function(DE1_results_ALL_df, day_label, condition_label, colour_label) {
+  
+  # add 'Day' and 'Condition' columns
+  DE1_results_ALL_df$Day <- day_label
+  DE1_results_ALL_df$Condition <- condition_label
+  
+  # create the volcano plot
+  volcano_plot <- ggplot(DE1_results_ALL_df, aes(x = log2FoldChange, y = -log10(pvalue))) +
+    geom_point(aes(color = (padj < 0.05  & abs(log2FoldChange) > 1.5)), alpha = 0.6, size = 2) +
+    scale_color_manual(values = c("gray", colour_label)) +
+    theme_classic() +
+    ggtitle(paste(day_label, ":", condition_label, "vs Mock")) +
+    xlab(expression(Log[2]~"(Fold Change)")) +
+    ylab(expression(-Log[10]~"("*italic(P)*"-value)")) +
+    theme(legend.position = "none",
+          text = element_text(family = "Times"))
+  
+  return(volcano_plot)
+}
+```
+
+#### Plot individual volcano plots
+```{r}
+# Low vs. Mock
+ggsave("Volcano_indiv_Day1_LvM.png", plot_volcano(Day1_LOWvsMOCK_df, "Day1", "LOW", "blue"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day2_LvM.png", plot_volcano(Day2_LOWvsMOCK_df, "Day2", "LOW", "blue"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day3_LvM.png", plot_volcano(Day3_LOWvsMOCK_df, "Day3", "LOW", "blue"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day4_LvM.png", plot_volcano(Day4_LOWvsMOCK_df, "Day4", "LOW", "blue"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day5_LvM.png", plot_volcano(Day5_LOWvsMOCK_df, "Day5", "LOW", "blue"), width = 5, height = 3.5, dpi = 300)
+
+# High vs. Mock
+ggsave("Volcano_indiv_Day1_HvM.png", plot_volcano(Day1_HIGHvsMOCK_df, "Day1", "HIGH", "red"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day2_HvM.png", plot_volcano(Day2_HIGHvsMOCK_df, "Day2", "HIGH", "red"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day3_HvM.png", plot_volcano(Day3_HIGHvsMOCK_df, "Day3", "HIGH", "red"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day4_HvM.png", plot_volcano(Day4_HIGHvsMOCK_df, "Day4", "HIGH", "red"), width = 5, height = 3.5, dpi = 300)
+ggsave("Volcano_indiv_Day5_HvM.png", plot_volcano(Day5_HIGHvsMOCK_df, "Day5", "HIGH", "red"), width = 5, height = 3.5, dpi = 300)
+```
+
+#### Generate volcano plots for each dose for each day
+```{r}
+# p-value < 0.05 and Log2FC > |1.5|
+volcano_plot <- DE1_results_ALL_df %>%
+  mutate(Day = gsub("Day", "Day ", Day),
+         sig = !is.na(padj) & padj < 0.05 & !is.na(log2FoldChange) & abs(log2FoldChange) > 1.5,
+         direction = case_when(
+           sig & log2FoldChange >  1.5 ~ "Up",
+           sig & log2FoldChange < -1.5 ~ "Down",
+           TRUE ~ "NotSig"))
+
+# counts per facet
+deg_counts <- volcano_plot %>%
+  group_by(Day, Condition) %>%
+  summarise(Up = sum(direction == "Up", na.rm = TRUE),
+            Down = sum(direction == "Down", na.rm = TRUE),
+            Total = Up + Down,
+            .groups = "drop") %>%
+  mutate(label = paste0("Up: ", Up, "\nDown: ", Down, "\nTotal: ", Total))
+
+# plot
+volcano_S2 <- ggplot(volcano_plot, aes(x = log2FoldChange, y = -log10(pvalue))) +
+  geom_point(aes(color = direction), alpha = 0.25, size = 1) +
+  scale_color_manual(name = NULL,
+                     values = c("Up" = "red", "Down" = "blue", "NotSig" = "gray"),
+                     labels = c("Up"="Up", "Down"="Down", "NotSig"="Not significant")) +
+  facet_grid(Condition ~ Day, scales = "free_x") +
+  geom_label(data = deg_counts,
+             aes(x = -Inf, y = Inf, label = label),
+             inherit.aes = FALSE,
+             hjust = -0.1, vjust = 1.1,
+             label.size = 0, fill = "white",
+             family = "Times") +
+  theme_classic() +
+  labs(x = expression(Log[2]~"(Fold Change)"),
+       y = expression(-Log[10]~"(p-value)")) +
+  theme(text = element_text(family = "Times"),
+        axis.title = element_text(size = 17, face = "bold"),
+        axis.text = element_text(size = 13),
+        legend.title = element_text(size = 15, face = "bold"),
+        legend.text = element_text(size = 13),
+        legend.position = "bottom",
+        strip.text = element_markdown(size = 14, face = "bold"),  
+        panel.border = element_rect(color = "black", fill = NA, size = 0.4),
+        axis.line = element_line(size = 0.1, color = "black"),
+        strip.background = element_rect(color = "black", fill = "white", size = 0.4))  
+
+ggsave("Volcano_S2.png", volcano_S2, width = 11, height = 8, dpi = 300)
+```
+
+### Confirm accurate DE results
+```{r}
+res <- results(DE_1,
+               contrast = c("Collection_Date", "Day3_LOW", "Day3_MOCK"),
+               alpha = 0.05)
+
+sum(!is.na(res$padj) & res$padj < 0.05 & abs(res$log2FoldChange) > 1.5)
+
+Up <- sum(res$padj < 0.05 & res$log2FoldChange > 1.5, na.rm = TRUE)
+Down <- sum(res$padj < 0.05 & res$log2FoldChange < -1.5, na.rm = TRUE)
+
+Up
+Down
+Up + Down
+```
+
+
+## Part II. Generate bar-coded volcano plot
+
+#### Sort DE genes to up- and down-regulated, determine counts
+```{r}
+# sort DE genes
+DE1_results_ALL_df_plot_2 <- DE1_results_ALL_df %>%
+  mutate(Regulation = case_when(
+    !is.na(padj) & padj < 0.05 & log2FoldChange > 1.5 ~ "Upregulated",
+    !is.na(padj) & padj < 0.05 & log2FoldChange < -1.5 ~ "Downregulated",
+    TRUE ~ "Not Significant"
+  )) %>%
+  mutate(Day = gsub("Day", "", Day),
+         Group = case_when(
+           Condition == "High" ~ "High dose",
+           Condition == "Low" ~ "Low dose"))
+
+# count the number of up- and down-regulated genes per condition and day
+bar_data_1 <- DE1_results_ALL_df_plot_2 %>%
+  filter(Regulation != "Not Significant") %>%
+  group_by(Day, Condition, Regulation) %>%
+  summarise(Gene_Count = n(), .groups = "drop")
+```
+
+#### Plot
+```{r}
+# add labels and colour by condition
+bar_data_1 <- bar_data_1 %>%
+  mutate(Group_colored = case_when(
+    Condition == "High" ~ "<span style='color:red;'>High dose</span>",
+    Condition == "Low" ~ "<span style='color:blue;'>Low dose</span>"
+  )) %>%
+  mutate(Group_colored = factor(Group_colored, levels = c(
+    "<span style='color:red;'>High dose</span>",
+    "<span style='color:blue;'>Low dose</span>"
+  )))
+
+# plot
+Fig_3A <- ggplot(bar_data_1, aes(x = Day, y = Gene_Count, fill = Regulation)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.90) +
+  facet_wrap(~ Group_colored) +  
+  scale_fill_manual(values = c("Upregulated" = "orange", "Downregulated" = "purple")) +
+  labs(title = "Differentially Expressed Genes Over Time",
+       x = "Day",
+       y = "Gene Count",
+       fill = "Regulation") +
+  theme_classic() +
+  theme(
+    text = element_text(family = "Times"),
+    axis.title = element_text(size = 17, face = "bold"),
+    axis.text = element_text(size = 13),
+    legend.title = element_text(size = 15, face = "bold"),
+    legend.text = element_text(size = 13),
+    legend.position = "bottom",
+    strip.text = element_markdown(size = 14, face = "bold"),  
+    panel.border = element_rect(color = "black", fill = NA, size = 0.4),
+    axis.line = element_line(size = 0.1, color = "black"),
+    strip.background = element_rect(color = "black", fill = "white", size = 0.4))  
+
+ggsave("Bar_Graph_Tolerance_2.0.png", Fig_3A, width = 6, height = 4, dpi = 300)
+print(Fig_3A)
+```
+
+
+# Tolerance and sex analysis
+
+#### Load counts data and meta-data
+```{r}
+Counts2 <- read.table(file="Comp2readCountTDM_MERS_github.txt", sep="\t", header = TRUE, check.names = FALSE)
+
+names(Counts2) <- gsub("Aligned.sortedByCoord.out.bam", "", names(Counts2))
+
+StudyDes2 <- read.table(file="StudyDesignComp2_github.txt", sep="\t", header = TRUE)
+```
+
+#### Convert to matrix, filter out low read genes
+```{r}
+ddsMat2 <- DESeqDataSetFromMatrix(countData = Counts2, colData = StudyDes2, design = ~Collection_Date)
+nrow(ddsMat2)
+keep <- rowSums(counts(ddsMat2) >= 15) >= 6 # keeps genes that have 15 or more counts in at least 6 samples
+ddsMat <- ddsMat2[keep,]
+nrow(ddsMat2)
+```
+
+#### Run DE analysis
+```{r}
+DE_2 <- DESeq(ddsMat2)
+```
+
+## Part I. Generate individual and combined volcano plots
+
+#### Extract results for specific comparisons
+```{r}
+# Low vs. Mock Female
+Day1_LOWvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day1_LOW_F", "Day1_MOCK_F"))
+Day1_LOWvsMOCK_F_df <- as.data.frame(Day1_LOWvsMOCK_F)
+Day1_LOWvsMOCK_F_df$Gene <- rownames(Day1_LOWvsMOCK_F_df)
+Day1_LOWvsMOCK_F_df$Day <- "Day1"
+Day1_LOWvsMOCK_F_df$Condition <- "Low"
+Day1_LOWvsMOCK_F_df$Sex <- "Female"
+
+Day2_LOWvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day2_LOW_F", "Day2_MOCK_F"))
+Day2_LOWvsMOCK_F_df <- as.data.frame(Day2_LOWvsMOCK_F)
+Day2_LOWvsMOCK_F_df$Gene <- rownames(Day2_LOWvsMOCK_F_df)
+Day2_LOWvsMOCK_F_df$Day <- "Day2"
+Day2_LOWvsMOCK_F_df$Condition <- "Low"
+Day2_LOWvsMOCK_F_df$Sex <- "Female"
+
+Day3_LOWvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day3_LOW_F", "Day3_MOCK_F"))
+Day3_LOWvsMOCK_F_df <- as.data.frame(Day3_LOWvsMOCK_F)
+Day3_LOWvsMOCK_F_df$Gene <- rownames(Day3_LOWvsMOCK_F_df)
+Day3_LOWvsMOCK_F_df$Day <- "Day3"
+Day3_LOWvsMOCK_F_df$Condition <- "Low"
+Day3_LOWvsMOCK_F_df$Sex <- "Female"
+
+Day4_LOWvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day4_LOW_F", "Day4_MOCK_F"))
+Day4_LOWvsMOCK_F_df <- as.data.frame(Day4_LOWvsMOCK_F)
+Day4_LOWvsMOCK_F_df$Gene <- rownames(Day4_LOWvsMOCK_F_df)
+Day4_LOWvsMOCK_F_df$Day <- "Day4"
+Day4_LOWvsMOCK_F_df$Condition <- "Low"
+Day4_LOWvsMOCK_F_df$Sex <- "Female"
+
+Day5_LOWvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day5_LOW_F", "Day5_MOCK_F"))
+Day5_LOWvsMOCK_F_df <- as.data.frame(Day5_LOWvsMOCK_F)
+Day5_LOWvsMOCK_F_df$Gene <- rownames(Day5_LOWvsMOCK_F_df)
+Day5_LOWvsMOCK_F_df$Day <- "Day5"
+Day5_LOWvsMOCK_F_df$Condition <- "Low"
+Day5_LOWvsMOCK_F_df$Sex <- "Female"
+
+# Low vs. Mock Male
+Day1_LOWvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day1_LOW_M", "Day1_MOCK_M"))
+Day1_LOWvsMOCK_M_df <- as.data.frame(Day1_LOWvsMOCK_M)
+Day1_LOWvsMOCK_M_df$Gene <- rownames(Day1_LOWvsMOCK_M_df)
+Day1_LOWvsMOCK_M_df$Day <- "Day1"
+Day1_LOWvsMOCK_M_df$Condition <- "Low"
+Day1_LOWvsMOCK_M_df$Sex <- "Male"
+
+Day2_LOWvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day2_LOW_M", "Day2_MOCK_M"))
+Day2_LOWvsMOCK_M_df <- as.data.frame(Day2_LOWvsMOCK_M)
+Day2_LOWvsMOCK_M_df$Gene <- rownames(Day2_LOWvsMOCK_M_df)
+Day2_LOWvsMOCK_M_df$Day <- "Day2"
+Day2_LOWvsMOCK_M_df$Condition <- "Low"
+Day2_LOWvsMOCK_M_df$Sex <- "Male"
+
+Day3_LOWvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day3_LOW_M", "Day3_MOCK_M"))
+Day3_LOWvsMOCK_M_df <- as.data.frame(Day3_LOWvsMOCK_M)
+Day3_LOWvsMOCK_M_df$Gene <- rownames(Day3_LOWvsMOCK_M_df)
+Day3_LOWvsMOCK_M_df$Day <- "Day3"
+Day3_LOWvsMOCK_M_df$Condition <- "Low"
+Day3_LOWvsMOCK_M_df$Sex <- "Male"
+
+Day4_LOWvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day4_LOW_M", "Day4_MOCK_M"))
+Day4_LOWvsMOCK_M_df <- as.data.frame(Day4_LOWvsMOCK_M)
+Day4_LOWvsMOCK_M_df$Gene <- rownames(Day4_LOWvsMOCK_M_df)
+Day4_LOWvsMOCK_M_df$Day <- "Day4"
+Day4_LOWvsMOCK_M_df$Condition <- "Low"
+Day4_LOWvsMOCK_M_df$Sex <- "Male"
+
+Day5_LOWvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day5_LOW_M", "Day5_MOCK_M"))
+Day5_LOWvsMOCK_M_df <- as.data.frame(Day5_LOWvsMOCK_M)
+Day5_LOWvsMOCK_M_df$Gene <- rownames(Day5_LOWvsMOCK_M_df)
+Day5_LOWvsMOCK_M_df$Day <- "Day5"
+Day5_LOWvsMOCK_M_df$Condition <- "Low"
+Day5_LOWvsMOCK_M_df$Sex <- "Male"
+
+# High vs. Mock Female
+Day1_HIGHvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day1_HIGH_F", "Day1_MOCK_F"))
+Day1_HIGHvsMOCK_F_df <- as.data.frame(Day1_HIGHvsMOCK_F)
+Day1_HIGHvsMOCK_F_df$Gene <- rownames(Day1_HIGHvsMOCK_F_df)
+Day1_HIGHvsMOCK_F_df$Day <- "Day1"
+Day1_HIGHvsMOCK_F_df$Condition <- "High"
+Day1_HIGHvsMOCK_F_df$Sex <- "Female"
+
+Day2_HIGHvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day2_HIGH_F", "Day2_MOCK_F"))
+Day2_HIGHvsMOCK_F_df <- as.data.frame(Day2_HIGHvsMOCK_F)
+Day2_HIGHvsMOCK_F_df$Gene <- rownames(Day2_HIGHvsMOCK_F_df)
+Day2_HIGHvsMOCK_F_df$Day <- "Day2"
+Day2_HIGHvsMOCK_F_df$Condition <- "High"
+Day2_HIGHvsMOCK_F_df$Sex <- "Female"
+
+Day3_HIGHvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day3_HIGH_F", "Day3_MOCK_F"))
+Day3_HIGHvsMOCK_F_df <- as.data.frame(Day3_HIGHvsMOCK_F)
+Day3_HIGHvsMOCK_F_df$Gene <- rownames(Day3_HIGHvsMOCK_F_df)
+Day3_HIGHvsMOCK_F_df$Day <- "Day3"
+Day3_HIGHvsMOCK_F_df$Condition <- "High"
+Day3_HIGHvsMOCK_F_df$Sex <- "Female"
+
+Day4_HIGHvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day4_HIGH_F", "Day4_MOCK_F"))
+Day4_HIGHvsMOCK_F_df <- as.data.frame(Day4_HIGHvsMOCK_F)
+Day4_HIGHvsMOCK_F_df$Gene <- rownames(Day4_HIGHvsMOCK_F_df)
+Day4_HIGHvsMOCK_F_df$Day <- "Day4"
+Day4_HIGHvsMOCK_F_df$Condition <- "High"
+Day4_HIGHvsMOCK_F_df$Sex <- "Female"
+
+Day5_HIGHvsMOCK_F <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day5_HIGH_F", "Day5_MOCK_F"))
+Day5_HIGHvsMOCK_F_df <- as.data.frame(Day5_HIGHvsMOCK_F)
+Day5_HIGHvsMOCK_F_df$Gene <- rownames(Day5_HIGHvsMOCK_F_df)
+Day5_HIGHvsMOCK_F_df$Day <- "Day5"
+Day5_HIGHvsMOCK_F_df$Condition <- "High"
+Day5_HIGHvsMOCK_F_df$Sex <- "Female"
+
+
+# High vs. Mock Male
+Day1_HIGHvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day1_HIGH_M", "Day1_MOCK_M"))
+Day1_HIGHvsMOCK_M_df <- as.data.frame(Day1_HIGHvsMOCK_M)
+Day1_HIGHvsMOCK_M_df$Gene <- rownames(Day1_HIGHvsMOCK_M_df)
+Day1_HIGHvsMOCK_M_df$Day <- "Day1"
+Day1_HIGHvsMOCK_M_df$Condition <- "High"
+Day1_HIGHvsMOCK_M_df$Sex <- "Male"
+
+Day2_HIGHvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day2_HIGH_M", "Day2_MOCK_M"))
+Day2_HIGHvsMOCK_M_df <- as.data.frame(Day2_HIGHvsMOCK_M)
+Day2_HIGHvsMOCK_M_df$Gene <- rownames(Day2_HIGHvsMOCK_M_df)
+Day2_HIGHvsMOCK_M_df$Day <- "Day2"
+Day2_HIGHvsMOCK_M_df$Condition <- "High"
+Day2_HIGHvsMOCK_M_df$Sex <- "Male"
+
+Day3_HIGHvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day3_HIGH_M", "Day3_MOCK_M"))
+Day3_HIGHvsMOCK_M_df <- as.data.frame(Day3_HIGHvsMOCK_M)
+Day3_HIGHvsMOCK_M_df$Gene <- rownames(Day3_HIGHvsMOCK_M_df)
+Day3_HIGHvsMOCK_M_df$Day <- "Day3"
+Day3_HIGHvsMOCK_M_df$Condition <- "High"
+Day3_HIGHvsMOCK_M_df$Sex <- "Male"
+
+Day4_HIGHvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day4_HIGH_M", "Day4_MOCK_M"))
+Day4_HIGHvsMOCK_M_df <- as.data.frame(Day4_HIGHvsMOCK_M)
+Day4_HIGHvsMOCK_M_df$Gene <- rownames(Day4_HIGHvsMOCK_M_df)
+Day4_HIGHvsMOCK_M_df$Day <- "Day4"
+Day4_HIGHvsMOCK_M_df$Condition <- "High"
+Day4_HIGHvsMOCK_M_df$Sex <- "Male"
+
+Day5_HIGHvsMOCK_M <- results(DE_2, alpha = 0.05, contrast = c("Collection_Date", "Day5_HIGH_M", "Day5_MOCK_M"))
+Day5_HIGHvsMOCK_M_df <- as.data.frame(Day5_HIGHvsMOCK_M)
+Day5_HIGHvsMOCK_M_df$Gene <- rownames(Day5_HIGHvsMOCK_M_df)
+Day5_HIGHvsMOCK_M_df$Day <- "Day5"
+Day5_HIGHvsMOCK_M_df$Condition <- "High"
+Day5_HIGHvsMOCK_M_df$Sex <- "Male"
+
+# combine results from all comparisons
+DE2_results_LOW_F_df <- rbind(Day1_LOWvsMOCK_F_df, Day2_LOWvsMOCK_F_df, Day3_LOWvsMOCK_F_df, Day4_LOWvsMOCK_F_df, Day5_LOWvsMOCK_F_df)
+DE2_results_LOW_M_df <- rbind(Day1_LOWvsMOCK_M_df, Day2_LOWvsMOCK_M_df, Day3_LOWvsMOCK_M_df, Day4_LOWvsMOCK_M_df, Day5_LOWvsMOCK_M_df)
+
+DE2_results_HIGH_F_df <- rbind(Day1_HIGHvsMOCK_F_df, Day2_HIGHvsMOCK_F_df, Day3_HIGHvsMOCK_F_df, Day4_HIGHvsMOCK_F_df, Day5_HIGHvsMOCK_F_df)
+DE2_results_HIGH_M_df <- rbind(Day1_HIGHvsMOCK_M_df, Day2_HIGHvsMOCK_M_df, Day3_HIGHvsMOCK_M_df, Day4_HIGHvsMOCK_M_df, Day5_HIGHvsMOCK_M_df)
+
+DE2_results_ALL_df <- rbind(DE2_results_LOW_F_df, DE2_results_LOW_M_df, DE2_results_HIGH_F_df, DE2_results_HIGH_M_df)
+
+DE2_results_F_df <- rbind(Day1_LOWvsMOCK_F_df, Day2_LOWvsMOCK_F_df, Day3_LOWvsMOCK_F_df, Day4_LOWvsMOCK_F_df, Day5_LOWvsMOCK_F_df,
+                          Day1_HIGHvsMOCK_F_df, Day2_HIGHvsMOCK_F_df, Day3_HIGHvsMOCK_F_df, Day4_HIGHvsMOCK_F_df, Day5_HIGHvsMOCK_F_df)
+
+DE2_results_M_df <- rbind(Day1_LOWvsMOCK_M_df, Day2_LOWvsMOCK_M_df, Day3_LOWvsMOCK_M_df, Day4_LOWvsMOCK_M_df, Day5_LOWvsMOCK_M_df,
+                          Day1_HIGHvsMOCK_M_df, Day2_HIGHvsMOCK_M_df, Day3_HIGHvsMOCK_M_df, Day4_HIGHvsMOCK_M_df, Day5_HIGHvsMOCK_M_df)
+```
+
+#### Generate plotting function
+```{r}
+plot_volcano <- function(DE2_results_ALL_df, day_label, condition_label, colour_label, sex_label) {
+  
+  # add 'Day' and 'Condition' columns
+  DE2_results_ALL_df$Day <- day_label
+  DE2_results_ALL_df$Condition <- condition_label
+  DE2_results_ALL_df$Sex <- sex_label
+  
+  # create the volcano plot
+  volcano_plot <- ggplot(DE2_results_ALL_df, aes(x = log2FoldChange, y = -log10(pvalue))) +
+    geom_point(aes(color = (padj < 0.05  & abs(log2FoldChange) > 1.5)), alpha = 0.6, size = 2) +
+    scale_color_manual(values = c("gray", colour_label)) +
+    theme_classic() +
+    ggtitle(paste(day_label, ":", condition_label, "vs Mock")) +
+    xlab(expression(Log[2]~"(Fold Change)")) +
+    ylab(expression(-Log[10]~"("*italic(P)*"-value)")) +
+    theme(legend.position = "none",
+          text = element_text(family = "Times"))
+  
+  return(volcano_plot)
+}
+```
+
+# Generate lethal and tolerant female volcano plot
+```{r}
+# p-value < 0.05 and Log2FC > |1.5| for females only
+volcano_F <- DE2_results_F_df %>%
+  mutate(
+    Day = gsub("Day", "Day ", Day),
+    pvalue = ifelse(pvalue == 0, 1e-300, pvalue),
+    sig = !is.na(padj) & padj < 0.05 & !is.na(log2FoldChange) & abs(log2FoldChange) > 1.5,
+    direction = case_when(
+      sig & log2FoldChange >  1.5 ~ "Up",
+      sig & log2FoldChange < -1.5 ~ "Down",
+      TRUE ~ "NotSig"))
+
+# DEG counts per facet (Day x Condition)
+deg_counts_F <- volcano_F %>%
+  group_by(Day, Condition) %>%
+  summarise(
+    Up = sum(direction == "Up", na.rm = TRUE),
+    Down = sum(direction == "Down", na.rm = TRUE),
+    Total = Up + Down,
+    .groups = "drop") %>%
+  mutate(label = paste0("Up: ", Up, "\nDown: ", Down, "\nTotal: ", Total))
+
+# plot
+S5A <- ggplot(volcano_F, aes(x = log2FoldChange, y = -log10(pvalue),color = direction, shape = Sex)) +
+  geom_point(alpha = 0.2, size = 2) +
+  scale_color_manual(
+    name = NULL,
+    values = c("Up" = "red", "Down" = "blue", "NotSig" = "gray"),
+    labels = c("Up" = "Up", "Down" = "Down", "NotSig" = "Not significant")) +
+  scale_shape_manual(
+    name = "Sex",
+    values = c("Female" = 17)) +
+  facet_grid(Condition ~ Day, scales = "free_x") +
+  geom_label(
+    data = deg_counts_F,
+    aes(x = -Inf, y = Inf, label = label),
+    inherit.aes = FALSE,
+    hjust = -0.1, vjust = 1.1,
+    size = 5,
+    label.size = 0,
+    fill = "white",
+    family = "Times") +
+  theme_classic() +
+  xlab(expression(bold(Log[2]~"(Fold Change)"))) +
+  ylab(expression(bold(-Log[10]~"("*italic(p)*"-value)"))) +
+  theme(
+    text = element_text(family = "Times"),
+    axis.title = element_text(size = 15, face = "bold"),
+    axis.text = element_text(size = 13),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 13),
+    legend.position = "bottom",
+    strip.text = element_markdown(size = 14, face = "bold"),
+    panel.border = element_rect(color = "black", fill = NA, size = 0.4),
+    axis.line = element_line(size = 0.1, color = "black"),
+    strip.background = element_rect(color = "black", fill = "white", size = 0.4)) +
+  guides(shape = guide_legend(order = 1),
+         color = guide_legend(order = 2))
+
+ggsave("S5A.png", S5A, width = 10, height = 7, dpi = 300)
+print(S5A)
+```
+
+### UPDATED MALE
+```{r}
+# p-value < 0.05 and Log2FC > |1.5| for males only
+volcano_M <- DE2_results_M_df %>%
+  mutate(Day = gsub("Day", "Day ", Day),
+         pvalue = ifelse(pvalue == 0, 1e-300, pvalue),
+         sig = !is.na(padj) & padj < 0.05 & !is.na(log2FoldChange) & abs(log2FoldChange) > 1.5,
+         direction = case_when(
+           sig & log2FoldChange >  1.5 ~ "Up",
+           sig & log2FoldChange < -1.5 ~ "Down",
+           TRUE ~ "NotSig"))
+
+# DEG counts per facet (Day x Condition)
+deg_counts_M <- volcano_M %>%
+  group_by(Day, Condition) %>%
+  summarise(Up = sum(direction == "Up", na.rm = TRUE),
+            Down = sum(direction == "Down", na.rm = TRUE),
+            Total = Up + Down,
+            .groups = "drop") %>%
+  mutate(label = paste0("Up: ", Up, "\nDown: ", Down, "\nTotal: ", Total))
+
+# plot
+S5B <- ggplot(volcano_M, aes(x = log2FoldChange, y = -log10(pvalue), color = direction, shape = Sex)) +
+  geom_point(alpha = 0.2, size = 2) +
+  scale_color_manual(
+    name = NULL,
+    values = c("Up" = "red", "Down" = "blue", "NotSig" = "gray"),
+    labels = c("Up" = "Up", "Down" = "Down", "NotSig" = "Not significant")) +
+  scale_shape_manual(
+    name = "Sex",
+    values = c("Male" = 15)) +
+  facet_grid(Condition ~ Day, scales = "free_x") +
+  geom_label(
+    data = deg_counts_M,
+    aes(x = -Inf, y = Inf, label = label),
+    inherit.aes = FALSE,
+    hjust = -0.1, vjust = 1.1,
+    size = 5,
+    label.size = 0,
+    fill = "white",
+    family = "Times") +
+  theme_classic() +
+  xlab(expression(bold(Log[2]~"(Fold Change)"))) +
+  ylab(expression(bold(-Log[10]~"("*italic(p)*"-value)"))) +
+  theme(
+    text = element_text(family = "Times"),
+    axis.title = element_text(size = 15, face = "bold"),
+    axis.text = element_text(size = 13),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 13),
+    legend.position = "bottom",
+    strip.text = element_text(size = 14, face = "bold"),
+    panel.border = element_rect(color = "black", fill = NA, size = 0.4),
+    axis.line = element_line(size = 0.1, color = "black"),
+    strip.background = element_rect(color = "black", fill = "white", size = 0.4)) +
+  guides(shape = guide_legend(order = 1),
+         color = guide_legend(order = 2))
+
+ggsave("S5B.png", S5B, width = 10, height = 7, dpi = 300)
+print(S5B)
+```
+
+### Confirm accurate DE results by sex
+```{r}
+res <- results(DE_2,
+               contrast = c("Collection_Date", "Day3_LOW_F", "Day3_MOCK_F"),
+               alpha = 0.05)
+
+sum(!is.na(res$padj) & res$padj < 0.05 & abs(res$log2FoldChange) > 1.5)
+
+Up <- sum(res$padj < 0.05 & res$log2FoldChange > 1.5, na.rm = TRUE)
+Down <- sum(res$padj < 0.05 & res$log2FoldChange < -1.5, na.rm = TRUE)
+
+Up
+Down
+Up + Down
+```
+
+## Part II. Generate bar-coded volcano plot
+
+#### Sort DE genes to up- and down-regulated, determine counts
+```{r}
+# sort DE genes
+DE2_results_ALL_df_plot_2 <- DE2_results_ALL_df %>%
+  mutate(Regulation = case_when(
+    !is.na(padj) & padj < 0.05 & log2FoldChange > 1.5 ~ "Upregulated",
+    !is.na(padj) & padj < 0.05 & log2FoldChange < -1.5 ~ "Downregulated",
+    TRUE ~ "Not Significant"
+  )) %>%
+  mutate(Day = gsub("Day", "", Day),
+         Group = case_when(
+           Condition == "High" & Sex == "Male" ~ "High dose male",
+           Condition == "High" & Sex == "Female" ~ "High dose female",
+           Condition == "Low" & Sex == "Male" ~ "Low dose male",
+           Condition == "Low" & Sex == "Female" ~ "Tolerant Female"
+         ))
+
+# count the number of up- and down-regulated genes per condition and day
+bar_data_2 <- DE2_results_ALL_df_plot_2 %>%
+  filter(Regulation != "Not Significant") %>%
+  group_by(Day, Group, Regulation) %>%
+  summarise(Gene_Count = n(), .groups = "drop")
+```
+
+### Plot
+```{r}
+# add labels and colour by condition
+bar_data_2 <- bar_data_2 %>%
+  mutate(Group_colored = case_when(
+    Group == "High dose female" ~ "<span style='color:red;'>High dose female</span>",
+    Group == "High dose male" ~ "<span style='color:sienna1;'>High dose male</span>",
+    Group == "Low dose female" ~ "<span style='color:blue;'>Low dose female</span>",
+    Group == "Low dose male" ~ "<span style='color:cadetblue3;'>Low dose male</span>"
+  )) %>%
+  mutate(Group_colored = factor(Group_colored, levels = c(
+    "<span style='color:red;'>High dose female</span>",
+    "<span style='color:sienna1;'>High dose male</span>",
+    "<span style='color:blue;'>Low dose female</span>",
+    "<span style='color:cadetblue3;'>Low dose male</span>"
+  )))
+
+# plot
+bar_plot_2 <- ggplot(bar_data_2, aes(x = Day, y = Gene_Count, fill = Regulation)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.9) +
+  facet_wrap(~ Group_colored, scales = "free_x", nrow=2) +  # Use colored text variable for facets
+  scale_fill_manual(values = c("Upregulated" = "orange", "Downregulated" = "purple")) +
+  labs(title = "Differentially Expressed Genes Over Time (By Group)",
+       x = "Day",
+       y = "Gene Count",
+       fill = "Regulation") +
+  theme_classic() +
+  theme(
+    text = element_text(family = "Times"),
+    axis.title = element_text(size = 20, face = "bold"),
+    axis.text = element_text(size = 16),
+    legend.title = element_text(size = 17, face = "bold"),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    strip.text = element_markdown(size = 16, face = "bold"),
+    panel.border = element_rect(color = "black", fill = NA, size = 0.4),
+    axis.line = element_line(size = 0.1, color = "black"),
+    strip.background = element_rect(color = "black", fill = "white", size = 0.4)
+  )
+
+ggsave("Bar_Graph_Tolerance&Sex_legend.png", bar_plot_2, width = 7, height = 7, dpi = 300)
+print(bar_plot_2)
+```
+```
